@@ -18,9 +18,11 @@ function sanitizeGame(g) {
     name: str(c.name, 20), value: num(c.value, -99, 99, 0), suit: str(c.suit, 3),
     color: /^#[0-9a-f]{6}$/i.test(c.color) ? c.color : '#111111',
     qty: num(c.qty, 1, 20, 1), effect: ['replay', 'draw2', 'double', 'wild'].includes(c.effect) ? c.effect : '',
-    kind: ['build', 'attack', 'cure', 'action'].includes(c.kind) ? c.kind : 'build',
+    kind: ['build', 'attack', 'cure', 'action', 'reaction'].includes(c.kind) ? c.kind : 'build',
     gives: tags(c.gives), requires: tags(c.requires), forbids: tags(c.forbids), immune: tags(c.immune),
-    removes: tags(c.removes)[0] || '', cures: tags(c.cures)[0] || '',
+    removes: tags(c.removes)[0] || '', cures: tags(c.cures)[0] || '', takes: tags(c.takes)[0] || '',
+    requiresAny: tags(c.requiresAny), reacts: tags(c.reacts), payTag: tags(c.payTag)[0] || '', payN: tags(c.payTag)[0] ? num(c.payN, 0, 9, 0) : 0,
+    steal: num(c.steal, 0, 5, 0),
     drawN: num(c.drawN, 0, 5, 0), targetDiscard: num(c.targetDiscard, 0, 5, 0),
     extraTurn: !!c.extraTurn, skipTarget: !!c.skipTarget, all: !!c.all,
   }));

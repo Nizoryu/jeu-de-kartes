@@ -5,7 +5,7 @@ const { Game, sanitizeGame, MAX_PLAYERS, buildDeck } = require('./engine');
 const { TableauGame } = require('./tableau');
 
 const PORT = +process.env.PORT || 3000;
-const STATIC = { '/': 'index.html', '/index.html': 'index.html', '/style.css': 'style.css', '/app.js': 'app.js' };
+const STATIC = { '/': 'index.html', '/index.html': 'index.html', '/style.css': 'style.css', '/app.js': 'app.js', '/samples.js': 'samples.js' };
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8' };
 const rooms = new Map();
 const rid = n => crypto.randomBytes(n).toString('hex');
@@ -70,11 +70,13 @@ async function api(req, res, url) {
     const isT = room.def.rules.mode === 'tableau', need = (isT ? TableauGame : Game).minCards(room.def.rules, room.players.length), have = room.def.cards.reduce((a, c) => a + c.qty, 0);
     if (have < need) return send(res, 400, { error: `Il faut au moins ${need} cartes dans le paquet (${have} actuellement).` });
     const names = room.players.map(p => p.name);
-    room.game = isT ? new TableauGame(room.def, names, buildDeck) : new Game(room.def, names); pushState(room); return send(res, 200, {});
+    room.game = isT ? new TableauGame(room.def, names, buildDeck) : new Game(room.def, names);
+    room.game.onChange = () => pushState(room); pushState(room); return send(res, 200, {});
   }
   if (!room.game) return send(res, 400, { error: "La partie n'a pas commencé." });
   let err;
   if (url.pathname === '/api/play') err = room.game.play(i, +b.card, b.target);
+  else if (url.pathname === '/api/react') err = room.game.react ? room.game.react(i, b.card == null ? null : +b.card) : 'Action impossible.';
   else if (url.pathname === '/api/discard') err = room.game.discardCard ? room.game.discardCard(i, +b.card) : 'Action impossible.';
   else if (url.pathname === '/api/draw') err = room.game.drawCard(i);
   else if (url.pathname === '/api/again') {

@@ -36,12 +36,19 @@ Chaque carte a un **type** et des **étiquettes** (mots libres : `marié`, `mala
 | Attaque | se pose dans la zone d'un adversaire (ou de tous) |
 | Soin | retire de ta zone une carte portant l'étiquette indiquée |
 | Action | effet immédiat, puis défausse |
+| Réaction | se garde en main ; jouable seulement pour **parer une attaque** qui te vise |
 | Donne l'étiquette | la carte, une fois posée, donne ces étiquettes à la zone |
-| Requiert / Interdit si | conditions pour jouer la carte (étiquettes présentes / absentes dans ta zone) |
+| Requiert / Interdit si | conditions pour jouer la carte (étiquettes présentes / absentes dans ta zone). `maison*3` = au moins 3 cartes portant l'étiquette |
+| Requiert l'un de | condition « OU » : au moins une des étiquettes listées |
+| Coût | dépense N cartes de ta zone portant l'étiquette (ex. 2 × `or`) : c'est la monnaie du jeu |
 | Immunise contre | tant que la carte est dans ta zone, les attaques portant ces étiquettes échouent |
 | Détruit chez la cible | l'attaque retire de la zone adverse une carte portant cette étiquette |
 | Pioche / Rejoue | piocher N cartes, rejouer immédiatement |
 | La cible défausse / passe son tour | défausse N cartes au hasard, saute son prochain tour |
+| Prend à la cible / Vole N cartes | déplace une carte de sa zone vers la tienne / pioche au hasard dans sa main |
+| Réaction : pare les attaques | liste d'étiquettes ou de noms d'attaques que la carte peut annuler |
 | Vise tous les adversaires | l'attaque touche tout le monde (sauf les immunisés) |
 
-Le bouton « Charger un exemple Tableau » fournit un paquet complet (thème pirates) pour comprendre le principe.
+Quand une attaque vise un joueur qui a une carte de réaction adaptée, la partie attend son choix (parer ou subir ; 25 s max). Une attaque contre un joueur immunisé échoue sans réaction possible.
+
+Deux jeux d'exemple sont fournis (boutons dans l'éditeur, code dans `samples.js`) : **Bâtisseurs** (cité, monnaie, catastrophes, vol, parades) et **Aventure en mer** (version simple).

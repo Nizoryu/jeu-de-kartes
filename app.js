@@ -3,12 +3,17 @@ const $ = id => document.getElementById(id);
 const KEY = 'kartes.games.v1';
 const uid = () => Math.random().toString(36).slice(2, 9);
 const EFFECTS = { '': '', replay: 'Rejoue', draw2: 'Adv. +2', double: '×2', wild: 'Joker' };
-const KINDS = { build: '🏗️', attack: '⚔️', cure: '💊', action: '⚡' };
-const KIND_NAMES = { build: 'Construction', attack: 'Attaque', cure: 'Soin', action: 'Action' };
+const KINDS = { build: '🏗️', attack: '⚔️', cure: '💊', action: '⚡', reaction: '🛡️' };
+const KIND_NAMES = { build: 'Construction', attack: 'Attaque', cure: 'Soin', action: 'Action', reaction: 'Réaction' };
 const list = v => Array.isArray(v) ? v : String(v || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 function describe(c) {
   const p = [KIND_NAMES[c.kind] || ''];
+  if (+c.payN && c.payTag) p.push('coûte ' + c.payN + ' × ' + c.payTag);
   if (list(c.requires).length) p.push('requiert ' + list(c.requires).join(', '));
+  if (list(c.requiresAny).length) p.push("requiert l'un de " + list(c.requiresAny).join(' / '));
+  if (list(c.reacts).length) p.push('pare : ' + list(c.reacts).join(', '));
+  if (c.takes) p.push('prend chez la cible « ' + c.takes + ' »');
+  if (+c.steal) p.push('vole ' + c.steal + ' carte(s) en main');
   if (list(c.forbids).length) p.push('interdit si ' + list(c.forbids).join(', '));
   if (list(c.gives).length) p.push('donne ' + list(c.gives).join(', '));
   if (list(c.immune).length) p.push('immunise contre ' + list(c.immune).join(', '));
@@ -51,7 +56,7 @@ function cardEl(c, tag = 'div') {
   const v = document.createElement('div'); v.className = 'v'; v.textContent = c.value;
   const s = document.createElement('div'); s.className = 's'; s.textContent = c.suit || '';
   const fx = document.createElement('div'); fx.className = 'fx';
-  fx.textContent = c.kind ? (KINDS[c.kind] || '') + ' ' + (list(c.gives)[0] || c.removes || c.cures || '') : (EFFECTS[c.effect] || '');
+  fx.textContent = c.kind ? (KINDS[c.kind] || '') + ' ' + (list(c.gives)[0] || c.removes || c.cures || c.takes || list(c.reacts)[0] || '') : (EFFECTS[c.effect] || '');
   if (c.kind) el.title = describe(c);
   el.append(n, v, s, fx);
   return el;
@@ -108,8 +113,10 @@ $('cardForm').onsubmit = e => {
     immune: $('cImmune').value, removes: $('cRemoves').value, cures: $('cCures').value,
     drawN: +$('cDraw').value || 0, targetDiscard: +$('cTDisc').value || 0,
     extraTurn: $('cExtra').checked, skipTarget: $('cSkip').checked, all: $('cAll').checked,
+    requiresAny: $('cReqAny').value, reacts: $('cReacts').value, takes: $('cTakes').value,
+    payTag: $('cPayTag').value, payN: +$('cPayN').value || 0, steal: +$('cSteal').value || 0,
   });
-  ['cGives', 'cRequires', 'cForbids', 'cImmune', 'cRemoves', 'cCures'].forEach(i => $(i).value = '');
+  ['cGives', 'cRequires', 'cForbids', 'cImmune', 'cRemoves', 'cCures', 'cReqAny', 'cReacts', 'cTakes', 'cPayTag'].forEach(i => $(i).value = '');
   $('cName').value = ''; save(); renderCards(); $('cName').focus();
 };
 $('clearCards').onclick = () => { if (confirm('Vider le paquet ?')) { cur().cards = []; save(); renderCards(); } };
@@ -119,30 +126,15 @@ $('presetStd').onclick = () => {
     names.forEach((name, i) => cur().cards.push({ id: uid(), name, value: i + 2, suit: s, color, qty: 1, effect: '' })));
   save(); renderCards();
 };
-const SAMPLE = [
-  ['Mousse', 1, '⚓', '#1b5fa8', 6, { kind: 'build', gives: 'équipage' }],
-  ['Capitaine', 4, '🏴‍☠️', '#222222', 2, { kind: 'build', gives: 'capitaine', requires: 'équipage', forbids: 'capitaine, scorbut' }],
-  ['Navire', 3, '⛵', '#7a4b1b', 3, { kind: 'build', gives: 'navire', requires: 'équipage', forbids: 'scorbut' }],
-  ['Trésor', 5, '💰', '#d17a00', 3, { kind: 'build', requires: 'navire', forbids: 'tempête' }],
-  ['Amulette', 1, '🧿', '#2b7a3d', 2, { kind: 'build', immune: 'scorbut, tempête' }],
-  ['Tempête', -2, '🌩️', '#555555', 3, { kind: 'attack', gives: 'tempête' }],
-  ['Scorbut', -1, '🤢', '#2b7a3d', 3, { kind: 'attack', gives: 'scorbut' }],
-  ['Abordage', 0, '⚔️', '#c0182b', 2, { kind: 'attack', removes: 'navire' }],
-  ['Brume', 0, '🌫️', '#777777', 2, { kind: 'attack', skipTarget: true }],
-  ['Pillage', 0, '🦜', '#c0182b', 2, { kind: 'attack', targetDiscard: 2, all: true }],
-  ['Citron', 0, '🍋', '#b59a00', 3, { kind: 'cure', cures: 'scorbut' }],
-  ['Beau temps', 0, '☀️', '#d17a00', 3, { kind: 'cure', cures: 'tempête' }],
-  ['Longue-vue', 0, '🔭', '#1b5fa8', 3, { kind: 'action', drawN: 2 }],
-  ['Vent favorable', 0, '💨', '#1b5fa8', 2, { kind: 'action', extraTurn: true }],
-];
-$('presetTab').onclick = () => {
-  const g = cur();
-  if (g.cards.length && !confirm('Remplacer le paquet actuel par l\'exemple ?')) return;
-  g.cards = SAMPLE.map(([name, value, suit, color, qty, fx]) => ({ id: uid(), name, value, suit, color, qty, effect: '', ...fx }));
-  g.rules.mode = 'tableau'; g.rules.hand = 5; g.rules.target = 0;
-  if (!g.rules.notes) g.rules.notes = "Pose des cartes dans ta zone pour marquer des points. Attaque les autres avec Tempête, Scorbut… et protège-toi avec Citron, Beau temps ou l'Amulette. Les étiquettes (équipage, navire…) conditionnent ce que tu peux poser.";
+function loadSample(key) {
+  const g = cur(), sm = SAMPLES.toGame(SAMPLES.GAMES[key], uid);
+  if (g.cards.length && !confirm("Remplacer le paquet et les règles de ce jeu par l'exemple ?")) return;
+  g.cards = sm.cards; g.rules = { ...defaultRules(), ...sm.rules };
+  if (!g.name || g.name.startsWith('Nouveau') || g.name.startsWith('Mon ')) g.name = sm.name;
   save(); renderAll();
-};
+}
+$('presetPirates').onclick = () => loadSample('pirates');
+$('presetBat').onclick = () => loadSample('batisseurs');
 const bindRule = (id, key, num) => $(id).oninput = e => { cur().rules[key] = num ? Math.max(0, +e.target.value || 0) : e.target.value; save(); applyMode(); };
 bindRule('rMode', 'mode'); bindRule('rHand', 'hand', 1); bindRule('rTarget', 'target', 1);
 bindRule('rHigher', 'higher'); bindRule('rPoints', 'points'); bindRule('rNotes', 'notes');
@@ -278,7 +270,7 @@ function renderTableau(g) {
     box.append(h, row); B.append(box);
   });
   const L = $('log'); L.textContent = ''; g.log.forEach(t => { const li = document.createElement('li'); li.textContent = t; L.append(li); });
-  const myTurn = !g.over && g.turn === g.you;
+  const myTurn = !g.over && !g.pending && g.turn === g.you;
   if (!g.hand.some(c => c.id === sel)) sel = null;
   const hand = $('hand'); hand.textContent = '';
   g.hand.forEach(c => {
@@ -287,7 +279,20 @@ function renderTableau(g) {
     el.onclick = () => { sel = c.id; render({ phase: 'play', game: g }); };
     hand.append(el);
   });
-  const bar = $('actionBar'); bar.textContent = ''; bar.hidden = !(myTurn && sel);
+  const bar = $('actionBar'); bar.textContent = '';
+  const pd = g.pending;
+  if (pd) {
+    bar.hidden = false;
+    const d = document.createElement('p'); d.className = 'desc';
+    if (pd.target === g.you) {
+      d.textContent = `⚠️ ${g.names[pd.from]} t'attaque avec ${describe(pd.card)}. Réagis !`; bar.append(d);
+      pd.options.forEach(id => { const k = g.hand.find(x => x.id === id);
+        const b = document.createElement('button'); b.textContent = '🛡️ Parer avec ' + k.name; b.onclick = () => act('/api/react', { card: id }); bar.append(b); });
+      const b = document.createElement('button'); b.className = 'ghost'; b.textContent = 'Subir'; b.onclick = () => act('/api/react', { card: null }); bar.append(b);
+    } else { d.textContent = `En attente de la réaction de ${g.names[pd.target]}…`; bar.append(d); }
+    $('drawBtn').hidden = true; $('againBtn').hidden = true; return;
+  }
+  bar.hidden = !(myTurn && sel);
   if (!bar.hidden) {
     const c = g.hand.find(x => x.id === sel), o = g.options[sel] || {};
     const d = document.createElement('p'); d.className = 'desc'; d.textContent = describe(c) + (o.ok ? '' : '  ⛔ ' + (o.reason || '')); bar.append(d);

@@ -54,14 +54,21 @@
             <option value="attack">Attaque : vise un adversaire</option>
             <option value="cure">Soin : retire un malus de ta zone</option>
             <option value="action">Action instantanée</option>
+            <option value="reaction">Réaction : se joue en défense, quand on t'attaque</option>
           </select>
         </label>
         <label>Donne l'étiquette <input id="cGives" placeholder="marié, malade…"></label>
-        <label>Requiert (dans ta zone) <input id="cRequires" placeholder="études"></label>
+        <label>Requiert (dans ta zone) <input id="cRequires" placeholder="études, maison*2"></label>
         <label>Interdit si tu as <input id="cForbids" placeholder="malade"></label>
         <label>Immunise contre <input id="cImmune" placeholder="malade, accident"></label>
         <label>Détruit chez la cible <input id="cRemoves" placeholder="métier"></label>
         <label>Soigne (retire de ta zone) <input id="cCures" placeholder="malade"></label>
+        <label>Requiert l'un de <input id="cReqAny" placeholder="marché, forge"></label>
+        <label>Coût : étiquette à dépenser <input id="cPayTag" placeholder="or"></label>
+        <label>Coût : combien <input id="cPayN" type="number" min="0" max="9" value="0"></label>
+        <label>Réaction : pare les attaques <input id="cReacts" placeholder="voleur, incendie"></label>
+        <label>Prend à la cible la carte <input id="cTakes" placeholder="or"></label>
+        <label>Vole N cartes en main <input id="cSteal" type="number" min="0" max="5" value="0"></label>
         <label>Pioche <input id="cDraw" type="number" min="0" max="5" value="0"></label>
         <label>La cible défausse <input id="cTDisc" type="number" min="0" max="5" value="0"></label>
         <label class="chk"><input id="cExtra" type="checkbox"> Rejoue</label>
@@ -71,7 +78,8 @@
       </form>
       <div class="row">
         <button id="presetStd" class="ghost not-tableau">Charger un jeu de 52 cartes</button>
-        <button id="presetTab" class="ghost">Charger un exemple « Tableau »</button>
+        <button id="presetBat" class="ghost">Exemple : Bâtisseurs</button>
+        <button id="presetPirates" class="ghost">Exemple : Aventure en mer</button>
         <button id="clearCards" class="ghost danger">Vider</button>
         <span id="cardCount" class="hint"></span>
       </div>
@@ -145,6 +153,7 @@
     </div>
   </main>
 </div>
+<script src="samples.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
