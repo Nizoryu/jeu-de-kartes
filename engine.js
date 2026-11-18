@@ -6,22 +6,28 @@ const MAX_PLAYERS = 6;
 function buildDeck(cards) {
   let n = 0;
   return shuffle(cards.flatMap(c => Array.from({ length: c.qty }, () => ({
-    id: ++n, name: c.name, value: c.value, suit: c.suit, color: c.color, effect: c.effect,
+    ...c, id: ++n, qty: undefined,
   }))));
 }
 
 function sanitizeGame(g) {
   const num = (v, min, max, d) => Math.min(max, Math.max(min, Number.isFinite(+v) ? Math.trunc(+v) : d));
   const str = (v, n) => String(v ?? '').slice(0, n);
+  const tags = v => [...new Set((Array.isArray(v) ? v : String(v ?? '').split(',')).map(t => str(t, 20).trim().toLowerCase()).filter(Boolean))].slice(0, 8);
   const cards = (Array.isArray(g.cards) ? g.cards : []).slice(0, 200).map(c => ({
     name: str(c.name, 20), value: num(c.value, -99, 99, 0), suit: str(c.suit, 3),
     color: /^#[0-9a-f]{6}$/i.test(c.color) ? c.color : '#111111',
     qty: num(c.qty, 1, 20, 1), effect: ['replay', 'draw2', 'double', 'wild'].includes(c.effect) ? c.effect : '',
+    kind: ['build', 'attack', 'cure', 'action'].includes(c.kind) ? c.kind : 'build',
+    gives: tags(c.gives), requires: tags(c.requires), forbids: tags(c.forbids), immune: tags(c.immune),
+    removes: tags(c.removes)[0] || '', cures: tags(c.cures)[0] || '',
+    drawN: num(c.drawN, 0, 5, 0), targetDiscard: num(c.targetDiscard, 0, 5, 0),
+    extraTurn: !!c.extraTurn, skipTarget: !!c.skipTarget, all: !!c.all,
   }));
   const r = g.rules || {};
   return {
     name: str(g.name, 40) || 'Jeu', cards, rules: {
-      mode: r.mode === 'defausse' ? 'defausse' : 'pli', hand: num(r.hand, 1, 20, 5), target: num(r.target, 0, 999, 0),
+      mode: ['defausse', 'tableau'].includes(r.mode) ? r.mode : 'pli', hand: num(r.hand, 1, 20, 5), target: num(r.target, 0, 999, 0),
       higher: r.higher === '0' ? '0' : '1', points: r.points === 'trick' ? 'trick' : 'value', notes: str(r.notes, 1000),
     },
   };
@@ -108,4 +114,4 @@ class Game {
     };
   }
 }
-module.exports = { Game, sanitizeGame, MAX_PLAYERS };
+module.exports = { Game, sanitizeGame, MAX_PLAYERS, buildDeck };

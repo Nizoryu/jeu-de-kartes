@@ -1,7 +1,8 @@
 'use strict';
 // Serveur Kartes : fichiers statiques + parties multijoueurs en réseau local (HTTP + Server-Sent Events, zéro dépendance).
 const http = require('http'), fs = require('fs'), path = require('path'), os = require('os'), crypto = require('crypto');
-const { Game, sanitizeGame, MAX_PLAYERS } = require('./engine');
+const { Game, sanitizeGame, MAX_PLAYERS, buildDeck } = require('./engine');
+const { TableauGame } = require('./tableau');
 
 const PORT = +process.env.PORT || 3000;
 const STATIC = { '/': 'index.html', '/index.html': 'index.html', '/style.css': 'style.css', '/app.js': 'app.js' };
@@ -66,13 +67,15 @@ async function api(req, res, url) {
   if (url.pathname === '/api/start') {
     if (i !== 0) return send(res, 403, { error: "Seul l'hôte peut lancer la partie." });
     if (room.players.length < 2) return send(res, 400, { error: 'Il faut au moins 2 joueurs.' });
-    const need = Game.minCards(room.def.rules, room.players.length), have = room.def.cards.reduce((a, c) => a + c.qty, 0);
+    const isT = room.def.rules.mode === 'tableau', need = (isT ? TableauGame : Game).minCards(room.def.rules, room.players.length), have = room.def.cards.reduce((a, c) => a + c.qty, 0);
     if (have < need) return send(res, 400, { error: `Il faut au moins ${need} cartes dans le paquet (${have} actuellement).` });
-    room.game = new Game(room.def, room.players.map(p => p.name)); pushState(room); return send(res, 200, {});
+    const names = room.players.map(p => p.name);
+    room.game = isT ? new TableauGame(room.def, names, buildDeck) : new Game(room.def, names); pushState(room); return send(res, 200, {});
   }
   if (!room.game) return send(res, 400, { error: "La partie n'a pas commencé." });
   let err;
-  if (url.pathname === '/api/play') err = room.game.play(i, +b.card);
+  if (url.pathname === '/api/play') err = room.game.play(i, +b.card, b.target);
+  else if (url.pathname === '/api/discard') err = room.game.discardCard ? room.game.discardCard(i, +b.card) : 'Action impossible.';
   else if (url.pathname === '/api/draw') err = room.game.drawCard(i);
   else if (url.pathname === '/api/again') {
     if (i !== 0 || !room.game.over) err = "Impossible."; else room.game = null;

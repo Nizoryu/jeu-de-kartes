@@ -44,3 +44,21 @@ label{display:block;font-size:.85rem;color:var(--mut)}
 .scores .pl.ready{border-color:#6fdc8c;color:#6fdc8c}
 .played{text-align:center}
 #lobbyPlayers li{padding:4px 0}
+.cardform{align-items:end}
+.adv{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;width:100%;padding:10px;border:1px dashed #fff3;border-radius:8px}
+.adv .chk{display:flex;gap:6px;align-items:center;color:var(--ink)}
+input[type=checkbox]{width:auto}
+body:not(.m-tableau) .only-tableau,body.m-tableau .not-tableau,body:not(.m-pli) .only-duel{display:none!important}
+.board{background:#0c1d16;border-radius:10px;padding:8px;margin:8px 0}
+.board.me{border:1px solid var(--accent)}.board.turn h3{color:var(--accent)}
+.board h3{margin:0 0 6px;font-size:.9rem;display:flex;gap:10px;flex-wrap:wrap}
+.board .cards{min-height:34px}
+.mini{width:54px;height:76px;padding:3px}.mini .v{font-size:1rem}.mini .n{font-size:.55rem}.mini .s{font-size:.8rem}.mini .fx{display:none}
+.actionbar{background:#0c1d16;border-radius:10px;padding:10px;margin:8px 0}
+.actionbar .desc{margin:0 0 8px;font-size:.9rem}
+.hand .card.sel{outline:3px solid var(--accent);transform:translateY(-8px)}
+.hand .card.dim{opacity:.6}
+.log{list-style:none;padding:0;margin:12px 0 0;font-size:.8rem;color:var(--mut);max-height:150px;overflow:auto}
+.log li{padding:1px 0}
+.log li:last-child{color:var(--ink)}
+[hidden]{display:none!important}

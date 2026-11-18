@@ -26,13 +26,13 @@
     </nav>
 
     <section id="tab-cards">
-      <form id="cardForm" class="row">
+      <form id="cardForm" class="row cardform">
         <label>Nom <input id="cName" required maxlength="20" placeholder="Dragon"></label>
-        <label>Valeur <input id="cValue" type="number" value="1" min="-99" max="99"></label>
+        <label>Valeur / points <input id="cValue" type="number" value="1" min="-99" max="99"></label>
         <label>Famille <input id="cSuit" maxlength="3" placeholder="🔥"></label>
         <label>Couleur <input id="cColor" type="color" value="#c0182b"></label>
         <label>Quantité <input id="cQty" type="number" value="1" min="1" max="20"></label>
-        <label>Effet
+        <label class="not-tableau">Effet
           <select id="cEffect">
             <option value="">Aucun</option>
             <option value="replay">Rejouer (défausse)</option>
@@ -42,9 +42,31 @@
           </select>
         </label>
         <button type="submit">Ajouter</button>
+        <div class="only-tableau adv">
+        <label>Type
+          <select id="cKind">
+            <option value="build">Construction : se pose dans ta zone</option>
+            <option value="attack">Attaque : vise un adversaire</option>
+            <option value="cure">Soin : retire un malus de ta zone</option>
+            <option value="action">Action instantanée</option>
+          </select>
+        </label>
+        <label>Donne l'étiquette <input id="cGives" placeholder="marié, malade…"></label>
+        <label>Requiert (dans ta zone) <input id="cRequires" placeholder="études"></label>
+        <label>Interdit si tu as <input id="cForbids" placeholder="malade"></label>
+        <label>Immunise contre <input id="cImmune" placeholder="malade, accident"></label>
+        <label>Détruit chez la cible <input id="cRemoves" placeholder="métier"></label>
+        <label>Soigne (retire de ta zone) <input id="cCures" placeholder="malade"></label>
+        <label>Pioche <input id="cDraw" type="number" min="0" max="5" value="0"></label>
+        <label>La cible défausse <input id="cTDisc" type="number" min="0" max="5" value="0"></label>
+        <label class="chk"><input id="cExtra" type="checkbox"> Rejoue</label>
+        <label class="chk"><input id="cSkip" type="checkbox"> La cible passe son tour</label>
+        <label class="chk"><input id="cAll" type="checkbox"> Vise tous les adversaires</label>
+      </div>
       </form>
       <div class="row">
-        <button id="presetStd" class="ghost">Charger un jeu de 52 cartes</button>
+        <button id="presetStd" class="ghost not-tableau">Charger un jeu de 52 cartes</button>
+        <button id="presetTab" class="ghost">Charger un exemple « Tableau »</button>
         <button id="clearCards" class="ghost danger">Vider</button>
         <span id="cardCount" class="hint"></span>
       </div>
@@ -57,14 +79,15 @@
           <select id="rMode">
             <option value="pli">Duel : chacun joue une carte, la plus forte gagne</option>
             <option value="defausse">Défausse : poser sur la même famille ou valeur, vider sa main</option>
+            <option value="tableau">Tableau : construire sa zone, attaquer les autres, se défendre (cartes à effets)</option>
           </select>
         </label>
         <label>Cartes en main <input id="rHand" type="number" min="1" max="20"></label>
         <label>Score à atteindre (0 = jouer tout le paquet) <input id="rTarget" type="number" min="0" max="999"></label>
-        <label>Duel : qui gagne ?
+        <label class="only-duel">Duel : qui gagne ?
           <select id="rHigher"><option value="1">La valeur la plus haute</option><option value="0">La valeur la plus basse</option></select>
         </label>
-        <label>Duel : points par pli
+        <label class="only-duel">Duel : points par pli
           <select id="rPoints"><option value="value">Somme des valeurs</option><option value="trick">1 point par pli</option></select>
         </label>
       </div>
@@ -103,10 +126,13 @@
       <div id="table" hidden>
         <div id="scores" class="scores"></div>
         <p class="hint" id="pileInfo"></p>
-        <div class="center"><div id="slotTable" class="cards"></div></div>
+        <div class="center" id="centerBox"><div id="slotTable" class="cards"></div></div>
+        <div id="boards"></div>
         <p id="msg" aria-live="polite"></p>
         <div class="row"><button id="drawBtn" class="ghost">Piocher</button><button id="againBtn" hidden>Retour au salon</button><button id="leaveBtn" class="ghost">Quitter</button></div>
+        <div id="actionBar" class="actionbar" hidden></div>
         <div id="hand" class="cards hand"></div>
+        <ul id="log" class="log"></ul>
       </div>
     </section>
   </main>
