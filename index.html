@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jeu de Kartes</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <h1>Jeu de Kartes</h1>
+  <p class="sub">Bataille : la carte la plus forte gagne le pli. Le premier à tout rafler gagne.</p>
+  <section class="board">
+    <div class="side"><h2>Ordinateur</h2><div class="card" id="cpuCard"></div><p>Cartes : <b id="cpuCount">26</b></p></div>
+    <div class="side"><h2>Toi</h2><div class="card" id="playerCard"></div><p>Cartes : <b id="playerCount">26</b></p></div>
+  </section>
+  <p id="message" aria-live="polite">Clique sur « Jouer un pli ».</p>
+  <div class="actions">
+    <button id="play">Jouer un pli</button>
+    <button id="restart" class="secondary">Nouvelle partie</button>
+  </div>
+</main>
+<script src="game.js"></script>
+</body>
+</html>

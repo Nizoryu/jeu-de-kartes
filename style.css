@@ -1,0 +1,11 @@
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,sans-serif;background:#0b6b3a;color:#fff;min-height:100vh;display:grid;place-items:center}
+main{width:min(560px,100%);padding:16px;text-align:center}
+.sub{opacity:.85}
+.board{display:flex;justify-content:space-around;margin:24px 0}
+.card{width:110px;height:154px;margin:8px auto;border-radius:10px;background:#fff;color:#111;display:grid;place-items:center;font-size:2.4rem;font-weight:700;box-shadow:0 4px 12px #0006}
+.card.red{color:#c0182b}
+.card.back{background:repeating-linear-gradient(45deg,#1b3a8a,#1b3a8a 8px,#274ab0 8px,#274ab0 16px);color:transparent}
+button{font-size:1rem;padding:10px 20px;border:0;border-radius:8px;background:#f5c518;cursor:pointer;margin:4px}
+button.secondary{background:#fff}
+button:disabled{opacity:.5;cursor:default}
