@@ -3,23 +3,114 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jeu de Kartes</title>
+<title>Kartes – Crée tes jeux de cartes</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<main>
-  <h1>Jeu de Kartes</h1>
-  <p class="sub">Bataille : la carte la plus forte gagne le pli. Le premier à tout rafler gagne.</p>
-  <section class="board">
-    <div class="side"><h2>Ordinateur</h2><div class="card" id="cpuCard"></div><p>Cartes : <b id="cpuCount">26</b></p></div>
-    <div class="side"><h2>Toi</h2><div class="card" id="playerCard"></div><p>Cartes : <b id="playerCount">26</b></p></div>
-  </section>
-  <p id="message" aria-live="polite">Clique sur « Jouer un pli ».</p>
-  <div class="actions">
-    <button id="play">Jouer un pli</button>
-    <button id="restart" class="secondary">Nouvelle partie</button>
-  </div>
-</main>
-<script src="game.js"></script>
+<header><h1>🃏 Kartes</h1><span class="tag">Crée tes jeux de cartes et joue avec tes règles</span></header>
+<div class="layout">
+  <aside>
+    <h2>Mes jeux</h2>
+    <ul id="gameList"></ul>
+    <button id="newGame">+ Nouveau jeu</button>
+    <button id="dupGame" class="ghost">Dupliquer</button>
+    <button id="delGame" class="ghost danger">Supprimer</button>
+    <p class="hint">Tout est enregistré dans ton navigateur.</p>
+  </aside>
+  <main>
+    <input id="gameName" class="title-input" aria-label="Nom du jeu">
+    <nav class="tabs" role="tablist">
+      <button data-tab="cards" class="active">Cartes</button>
+      <button data-tab="rules">Règles</button>
+      <button data-tab="play">Jouer</button>
+    </nav>
+
+    <section id="tab-cards">
+      <form id="cardForm" class="row">
+        <label>Nom <input id="cName" required maxlength="20" placeholder="Dragon"></label>
+        <label>Valeur <input id="cValue" type="number" value="1" min="-99" max="99"></label>
+        <label>Famille <input id="cSuit" maxlength="3" placeholder="🔥"></label>
+        <label>Couleur <input id="cColor" type="color" value="#c0182b"></label>
+        <label>Quantité <input id="cQty" type="number" value="1" min="1" max="20"></label>
+        <label>Effet
+          <select id="cEffect">
+            <option value="">Aucun</option>
+            <option value="replay">Rejouer (défausse)</option>
+            <option value="draw2">L'adversaire pioche 2 (défausse)</option>
+            <option value="double">Points ×2 (duel)</option>
+            <option value="wild">Joker : va sur tout (défausse)</option>
+          </select>
+        </label>
+        <button type="submit">Ajouter</button>
+      </form>
+      <div class="row">
+        <button id="presetStd" class="ghost">Charger un jeu de 52 cartes</button>
+        <button id="clearCards" class="ghost danger">Vider</button>
+        <span id="cardCount" class="hint"></span>
+      </div>
+      <div id="cardList" class="cards"></div>
+    </section>
+
+    <section id="tab-rules" hidden>
+      <div class="grid">
+        <label>Mode de jeu
+          <select id="rMode">
+            <option value="pli">Duel : chacun joue une carte, la plus forte gagne</option>
+            <option value="defausse">Défausse : poser sur la même famille ou valeur, vider sa main</option>
+          </select>
+        </label>
+        <label>Cartes en main <input id="rHand" type="number" min="1" max="20"></label>
+        <label>Score à atteindre (0 = jouer tout le paquet) <input id="rTarget" type="number" min="0" max="999"></label>
+        <label>Duel : qui gagne ?
+          <select id="rHigher"><option value="1">La valeur la plus haute</option><option value="0">La valeur la plus basse</option></select>
+        </label>
+        <label>Duel : points par pli
+          <select id="rPoints"><option value="value">Somme des valeurs</option><option value="trick">1 point par pli</option></select>
+        </label>
+      </div>
+      <label>Notes de règles (pour toi)
+        <textarea id="rNotes" rows="4" placeholder="Décris ton jeu…"></textarea>
+      </label>
+    </section>
+
+    <section id="tab-play" hidden>
+      <div id="conn">
+        <div class="grid">
+          <div>
+            <h2>Héberger ce jeu</h2>
+            <label>Ton pseudo <input id="hostName" maxlength="16" placeholder="Alice"></label>
+            <button id="hostBtn">Créer une partie</button>
+          </div>
+          <div>
+            <h2>Rejoindre une partie</h2>
+            <label>Code de la partie <input id="joinCode" inputmode="numeric" maxlength="4" placeholder="1234"></label>
+            <label>Ton pseudo <input id="joinName" maxlength="16" placeholder="Bob"></label>
+            <button id="joinBtn">Rejoindre</button>
+          </div>
+        </div>
+        <p class="hint" id="lanInfo"></p>
+      </div>
+      <p id="err" class="err" role="alert"></p>
+      <div id="lobby" hidden>
+        <h2>Salon : <span id="lobbyGame"></span></h2>
+        <p>Code de la partie : <b class="code" id="roomCode"></b></p>
+        <p class="hint">Les autres joueurs ouvrent la même adresse que toi, onglet « Jouer », puis entrent ce code.</p>
+        <ul id="lobbyPlayers"></ul>
+        <p id="lobbyNotes" class="hint"></p>
+        <button id="startBtn">Lancer la partie</button>
+        <span id="lobbyWait" class="hint"></span>
+      </div>
+      <div id="table" hidden>
+        <div id="scores" class="scores"></div>
+        <p class="hint" id="pileInfo"></p>
+        <div class="center"><div id="slotTable" class="cards"></div></div>
+        <p id="msg" aria-live="polite"></p>
+        <div class="row"><button id="drawBtn" class="ghost">Piocher</button><button id="againBtn" hidden>Retour au salon</button><button id="leaveBtn" class="ghost">Quitter</button></div>
+        <div id="hand" class="cards hand"></div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="app.js"></script>
 </body>
 </html>

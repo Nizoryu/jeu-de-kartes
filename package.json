@@ -1,0 +1,8 @@
+{
+  "name": "kartes",
+  "version": "1.0.0",
+  "description": "Crée tes jeux de cartes et joue en multijoueur sur réseau local",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "license": "MIT"
+}
