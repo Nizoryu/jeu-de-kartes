@@ -149,8 +149,16 @@ bindRule('rHigher', 'higher'); bindRule('rPoints', 'points'); bindRule('rNotes',
 
 document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
   document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('active', x === b));
-  ['cards', 'rules', 'play'].forEach(t => $('tab-' + t).hidden = t !== b.dataset.tab);
+  ['cards', 'rules'].forEach(t => $('tab-' + t).hidden = t !== b.dataset.tab);
 });
+
+/* ---------- Navigation Créer / Jouer ---------- */
+function showView(v) {
+  document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  $('view-create').hidden = v !== 'create'; $('view-play').hidden = v !== 'play';
+  if (v === 'play') renderLibrary();
+}
+document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => showView(b.dataset.view));
 
 /* ---------- Multijoueur (réseau local) ---------- */
 let S = null, es = null;   // S = { room, pid }
@@ -161,9 +169,9 @@ const api = async (path, body) => {
   return j;
 };
 const showErr = t => { $('err').textContent = t || ''; };
-const getName = id => $(id).value.trim() || localStorage.getItem('kartes.name') || 'Joueur';
+const getName = () => $('pName').value.trim() || 'Joueur';
 const remember = n => { try { localStorage.setItem('kartes.name', n); } catch (e) {} };
-try { $('hostName').value = $('joinName').value = localStorage.getItem('kartes.name') || ''; } catch (e) {}
+try { $('pName').value = localStorage.getItem('kartes.name') || ''; } catch (e) {}
 
 fetch('/api/info').then(r => r.json()).then(i => {
   $('lanInfo').textContent = i.urls.length ? 'Adresse à donner aux autres joueurs : ' + i.urls.join(' ou ') : '';
@@ -182,16 +190,33 @@ function leave() {
   try { sessionStorage.removeItem('kartes.session'); } catch (e) {}
   $('conn').hidden = false; $('lobby').hidden = true; $('table').hidden = true;
 }
-$('hostBtn').onclick = async () => {
-  const g = cur(); remember(getName('hostName'));
-  try { connect(await api('/api/create', { name: getName('hostName'), game: { name: g.name, cards: g.cards, rules: g.rules } })); }
+async function host(g) {
+  remember(getName());
+  try { connect(await api('/api/create', { name: getName(), game: { name: g.name, cards: g.cards, rules: g.rules } })); }
   catch (e) { showErr(e.message); }
-};
+}
 $('joinBtn').onclick = async () => {
-  remember(getName('joinName'));
-  try { connect(await api('/api/join', { room: $('joinCode').value.trim(), name: getName('joinName') })); }
+  remember(getName());
+  try { connect(await api('/api/join', { room: $('joinCode').value.trim(), name: getName() })); }
   catch (e) { showErr(e.message); }
 };
+const MODES = { pli: 'Duel', defausse: 'Défausse', tableau: 'Tableau (cartes à effets)' };
+function renderLibrary() {
+  const box = $('library'); box.textContent = '';
+  games.forEach(g => {
+    const n = g.cards.reduce((s, c) => s + c.qty, 0);
+    const d = document.createElement('div'); d.className = 'gamecard';
+    const info = document.createElement('div');
+    const t = document.createElement('h3'); t.textContent = g.name || '(sans nom)';
+    const p = document.createElement('p'); p.textContent = `${MODES[g.rules.mode] || ''} · ${n} cartes · ${g.rules.hand} en main`;
+    info.append(t, p);
+    if (g.rules.notes) { const q = document.createElement('p'); q.textContent = g.rules.notes.slice(0, 120); info.append(q); }
+    const b = document.createElement('button'); b.textContent = 'Héberger';
+    if (!n) { b.disabled = true; b.title = "Ce jeu n'a pas encore de cartes : va dans « Créer un jeu »."; }
+    b.onclick = () => host(g);
+    d.append(info, b); box.append(d);
+  });
+}
 $('startBtn').onclick = () => act('/api/start');
 $('drawBtn').onclick = () => act('/api/draw');
 $('againBtn').onclick = () => act('/api/again');
@@ -278,6 +303,6 @@ function renderTableau(g) {
 }
 
 // Reprise automatique après un rafraîchissement de la page
-try { const s = JSON.parse(sessionStorage.getItem('kartes.session')); if (s) connect(s); } catch (e) {}
+try { const s = JSON.parse(sessionStorage.getItem('kartes.session')); if (s) { showView('play'); connect(s); } } catch (e) {}
 
 renderAll();

@@ -7,22 +7,27 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header><h1>🃏 Kartes</h1><span class="tag">Crée tes jeux de cartes et joue avec tes règles</span></header>
-<div class="layout">
+<header>
+  <h1>🃏 Kartes</h1>
+  <nav class="mainnav">
+    <button data-view="create" class="active">🛠️ Créer un jeu</button>
+    <button data-view="play">🎮 Jouer</button>
+  </nav>
+</header>
+<div class="layout" id="view-create">
   <aside>
     <h2>Mes jeux</h2>
     <ul id="gameList"></ul>
     <button id="newGame">+ Nouveau jeu</button>
     <button id="dupGame" class="ghost">Dupliquer</button>
     <button id="delGame" class="ghost danger">Supprimer</button>
-    <p class="hint">Tout est enregistré dans ton navigateur.</p>
+    <p class="hint">Tout est enregistré dans ton navigateur. Quand ton jeu est prêt, va dans « Jouer ».</p>
   </aside>
   <main>
     <input id="gameName" class="title-input" aria-label="Nom du jeu">
     <nav class="tabs" role="tablist">
       <button data-tab="cards" class="active">Cartes</button>
       <button data-tab="rules">Règles</button>
-      <button data-tab="play">Jouer</button>
     </nav>
 
     <section id="tab-cards">
@@ -96,45 +101,48 @@
       </label>
     </section>
 
-    <section id="tab-play" hidden>
-      <div id="conn">
-        <div class="grid">
-          <div>
-            <h2>Héberger ce jeu</h2>
-            <label>Ton pseudo <input id="hostName" maxlength="16" placeholder="Alice"></label>
-            <button id="hostBtn">Créer une partie</button>
-          </div>
-          <div>
-            <h2>Rejoindre une partie</h2>
-            <label>Code de la partie <input id="joinCode" inputmode="numeric" maxlength="4" placeholder="1234"></label>
-            <label>Ton pseudo <input id="joinName" maxlength="16" placeholder="Bob"></label>
-            <button id="joinBtn">Rejoindre</button>
-          </div>
-        </div>
-        <p class="hint" id="lanInfo"></p>
+  </main>
+</div>
+
+<div class="layout single" id="view-play" hidden>
+  <main>
+    <div id="conn">
+      <label class="pseudo">Ton pseudo <input id="pName" maxlength="16" placeholder="Alice"></label>
+      <div class="grid2">
+        <section>
+          <h2>Jouer à un de mes jeux (je suis l'hôte)</h2>
+          <div id="library" class="library"></div>
+        </section>
+        <section>
+          <h2>Rejoindre la partie d'un autre joueur</h2>
+          <label>Code de la partie <input id="joinCode" inputmode="numeric" maxlength="4" placeholder="1234"></label>
+          <button id="joinBtn">Rejoindre</button>
+          <p class="hint">Pas besoin d'avoir le jeu : il est envoyé par l'hôte.</p>
+        </section>
       </div>
-      <p id="err" class="err" role="alert"></p>
-      <div id="lobby" hidden>
-        <h2>Salon : <span id="lobbyGame"></span></h2>
-        <p>Code de la partie : <b class="code" id="roomCode"></b></p>
-        <p class="hint">Les autres joueurs ouvrent la même adresse que toi, onglet « Jouer », puis entrent ce code.</p>
-        <ul id="lobbyPlayers"></ul>
-        <p id="lobbyNotes" class="hint"></p>
-        <button id="startBtn">Lancer la partie</button>
-        <span id="lobbyWait" class="hint"></span>
-      </div>
-      <div id="table" hidden>
-        <div id="scores" class="scores"></div>
-        <p class="hint" id="pileInfo"></p>
-        <div class="center" id="centerBox"><div id="slotTable" class="cards"></div></div>
-        <div id="boards"></div>
-        <p id="msg" aria-live="polite"></p>
-        <div class="row"><button id="drawBtn" class="ghost">Piocher</button><button id="againBtn" hidden>Retour au salon</button><button id="leaveBtn" class="ghost">Quitter</button></div>
-        <div id="actionBar" class="actionbar" hidden></div>
-        <div id="hand" class="cards hand"></div>
-        <ul id="log" class="log"></ul>
-      </div>
-    </section>
+      <p class="hint" id="lanInfo"></p>
+    </div>
+    <p id="err" class="err" role="alert"></p>
+    <div id="lobby" hidden>
+      <h2>Salon : <span id="lobbyGame"></span></h2>
+      <p>Code de la partie : <b class="code" id="roomCode"></b></p>
+      <p class="hint">Les autres joueurs ouvrent la même adresse, vont dans « Jouer » et entrent ce code.</p>
+      <ul id="lobbyPlayers"></ul>
+      <p id="lobbyNotes" class="hint"></p>
+      <button id="startBtn">Lancer la partie</button>
+      <span id="lobbyWait" class="hint"></span>
+    </div>
+    <div id="table" hidden>
+      <div id="scores" class="scores"></div>
+      <p class="hint" id="pileInfo"></p>
+      <div class="center" id="centerBox"><div id="slotTable" class="cards"></div></div>
+      <div id="boards"></div>
+      <p id="msg" aria-live="polite"></p>
+      <div class="row"><button id="drawBtn" class="ghost">Piocher</button><button id="againBtn" hidden>Retour au salon</button><button id="leaveBtn" class="ghost">Quitter</button></div>
+      <div id="actionBar" class="actionbar" hidden></div>
+      <div id="hand" class="cards hand"></div>
+      <ul id="log" class="log"></ul>
+    </div>
   </main>
 </div>
 <script src="app.js"></script>

@@ -12,15 +12,17 @@ Le serveur affiche les adresses à ouvrir (ex. `http://192.168.1.20:3000`). Chan
 
 ## Utiliser
 
-1. **Cartes** : crée ton paquet (nom, valeur, famille, couleur, quantité, effet) ou charge un jeu de 52 cartes.
-2. **Règles** : choisis le mode, le nombre de cartes en main, le score cible…
-   - *Duel* : tout le monde joue une carte en même temps, la plus forte (ou faible) gagne le pli.
-   - *Défausse* : à tour de rôle, on pose une carte de la même famille ou valeur ; le premier à vider sa main gagne.
-   - *Tableau* : chaque joueur construit sa zone, attaque les autres et se défend avec des **cartes à effets** (voir ci-dessous).
-3. **Jouer** : un joueur héberge (il obtient un code à 4 chiffres), les autres ouvrent la même adresse sur leur appareil et rejoignent avec le code.
+L'application est une **plateforme de jeux de cartes** avec deux espaces :
 
-Effets de cartes : rejouer, l'adversaire suivant pioche 2, points ×2 (duel), joker.
-Les jeux sont sauvegardés dans le navigateur (`localStorage`) ; la partie est gérée par le serveur (`engine.js`).
+- **🛠️ Créer un jeu** : tu crées autant de jeux que tu veux. Pour chacun :
+  1. **Cartes** : nom, valeur, famille, couleur, quantité, effet (ou, en mode Tableau, type et étiquettes, voir plus bas), ou charge un exemple.
+  2. **Règles** : choisis le mode, le nombre de cartes en main, le score cible…
+     - *Duel* : tout le monde joue une carte en même temps, la plus forte (ou faible) gagne le pli.
+     - *Défausse* : à tour de rôle, on pose une carte de la même famille ou valeur ; le premier à vider sa main gagne.
+     - *Tableau* : chaque joueur construit sa zone, attaque les autres et se défend avec des **cartes à effets**.
+- **🎮 Jouer** : tu choisis un de tes jeux et tu **l'héberges** (code à 4 chiffres), ou tu **rejoins** la partie d'un autre joueur avec son code. Les autres joueurs n'ont pas besoin d'avoir le jeu : l'hôte l'envoie. Entre 2 et 6 joueurs, sur le même réseau.
+
+Les jeux sont sauvegardés dans le navigateur (`localStorage`) ; la partie est gérée par le serveur (`engine.js`, `tableau.js`).
 
 ## Mode Tableau : des cartes qui impactent les joueurs
 
